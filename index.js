@@ -87,6 +87,7 @@ Chat.prototype.part = function (channel) {
 }
 
 Chat.prototype.say = function (channel, msg) {
+  if (!has(this.logs, channel)) return
   var data = {
     time: Date.now(),
     who: this.nym,

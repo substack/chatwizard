@@ -10,7 +10,8 @@ var state = {
   channel: location.hash || '(status)',
   nym: randomBytes(3).toString('hex'),
   lines: {},
-  activity: {}
+  activity: {},
+  scroll: {}
 }
 
 var memdb = require('memdb')
@@ -45,6 +46,11 @@ chat.on('say', function (channel, row) {
     state.activity[channel] = nymre.test(row.value.message)
       ? 'mentioned' : 'activity'
   }
+  var lines = root.querySelector('.lines')
+  if (lines.scrollHeight - lines.clientHeight === lines.scrollTop) {
+    // at bottom, scroll to bottom
+    state.scroll[channel] = Number.MAX_VALUE
+  }
   update()
 })
 
@@ -78,6 +84,7 @@ catchlinks(window, function (href) {
 
 function render (state) {
   location.hash = state.channel
+  var scroll = state.scroll[state.channel] || 0
   return html`<div id="content">
     <div class="channels"><div class="inner">
       ${state.channels.map(function (channel) {
@@ -89,7 +96,7 @@ function render (state) {
         </div>`
       })}
     </div></div>
-    <div class="lines"><div class="inner">
+    <div class="lines" onscroll=${onscroll} scroll=${scroll}><div class="inner">
       ${(state.lines[state.channel] || []).map(function (row) {
         var m = row.value
         return html`<div class="line">
@@ -115,6 +122,9 @@ function render (state) {
     var msg = this.elements.text.value
     this.reset()
     handleMsg(msg)
+  }
+  function onscroll (ev) {
+    state.scroll[state.channel] = this.scrollTop
   }
 }
 
