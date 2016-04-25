@@ -60,6 +60,12 @@ window.addEventListener('hashchange', function () {
   chat.join(location.hash)
 })
 
+window.addEventListener('keydown', function (ev) {
+  if (!ev.ctrlKey) {
+    root.querySelector('input[name="text"]').focus()
+  }
+})
+
 var catchlinks = require('catch-links')
 catchlinks(window, function (href) {
   var m = /(#.+)$/.exec(href)
@@ -100,12 +106,10 @@ function render (state) {
     </div>
     <form class="input" onsubmit=${onsubmit}>
       [${state.channel}]
-      <input type="text" name="text" onblur=${onblur}
-        autofocus
+      <input type="text" name="text" autofocus
         style="width: calc(100% - ${state.channel.length+6}ex)">
     </form>
   </div>`
-  function onblur () { this.focus() }
   function onsubmit (ev) {
     ev.preventDefault()
     var msg = this.elements.text.value
