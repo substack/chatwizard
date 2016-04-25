@@ -20,19 +20,22 @@ var chat = require('./index.js')(state.nym, memdb())
 chat.on('join', function (channel) {
   state.channels.push(channel)
   uniq(state.channels)
-  state.channel = channel
-  state.activity[channel] = false
+  selectChannel(channel)
   update()
 })
 chat.on('peer', update)
 chat.on('disconnect', update)
 setInterval(update, 1000)
 
+function selectChannel (channel) {
+  state.channel = channel
+  state.activity[channel] = false
+}
+
 chat.on('part', function (channel) {
   var ix = state.channels.indexOf(channel)
   if (ix >= 0) state.channels.splice(ix, 1)
-  state.channel = state.channels[Math.max(0,ix-1)] || '(status)'
-  state.activity[state.channel] = false
+  selectChannel(state.channels[Math.max(0,ix-1)] || '(status)')
   update()
 })
 
@@ -80,10 +83,22 @@ window.addEventListener('keydown', function (ev) {
   var code = ev.keyCode || ev.which
   var h = heights[state.channel]
   if (h && code === 33) { // PgUp
+    ev.preventDefault()
     state.scroll[state.channel] -= h.client
     update()
   } else if (h && code === 34) { // PgDown
+    ev.preventDefault()
     state.scroll[state.channel] += h.client
+    update()
+  } else if (ev.ctrlKey && (code === 74 || code === 40)) { // ^down, ^j
+    ev.preventDefault()
+    var ix = state.channels.indexOf(state.channel)
+    selectChannel(state.channels[(ix+1)%state.channels.length])
+    update()
+  } else if (ev.ctrlKey && (code === 75 || code === 38)) { // ^up, ^k
+    ev.preventDefault()
+    var ix = state.channels.indexOf(state.channel)
+    selectChannel(state.channels[(ix-1)%state.channels.length])
     update()
   }
 })
@@ -92,8 +107,7 @@ var catchlinks = require('catch-links')
 catchlinks(window, function (href) {
   var m = /(#.+)$/.exec(href)
   if (m) {
-    state.channel = m[1]
-    state.activity[state.channel] = false
+    selectChannel(m[1])
     update()
   }
 })
