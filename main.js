@@ -28,6 +28,7 @@ chat.on('disconnect', update)
 setInterval(update, 1000)
 
 function selectChannel (channel) {
+  if (!channel) return
   state.channel = channel
   state.activity[channel] = false
 }
