@@ -13,6 +13,7 @@ var state = {
   activity: {},
   scroll: {}
 }
+var heights = {}
 
 var memdb = require('memdb')
 var chat = require('./index.js')(state.nym, memdb())
@@ -56,6 +57,12 @@ chat.on('say', function (channel, row) {
 
 function update () {
   html.update(root, render(state))
+  var lines = root.querySelector('.lines')
+  heights[state.channel] = {
+    client: lines.clientHeight,
+    scroll: lines.scrollHeight
+  }
+  lines.scrollTop = state.scroll[state.channel]
 }
 update()
 window.addEventListener('resize', update)
@@ -69,6 +76,15 @@ window.addEventListener('hashchange', function () {
 window.addEventListener('keydown', function (ev) {
   if (!ev.ctrlKey) {
     root.querySelector('input[name="text"]').focus()
+  }
+  var code = ev.keyCode || ev.which
+  var h = heights[state.channel]
+  if (h && code === 33) { // PgUp
+    state.scroll[state.channel] -= h.client
+    update()
+  } else if (h && code === 34) { // PgDown
+    state.scroll[state.channel] += h.client
+    update()
   }
 })
 
