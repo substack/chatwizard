@@ -1,0 +1,6 @@
+node_modules
+*.log
+config.json
+.vscode
+/lib-cov
+/public/bundle.js
