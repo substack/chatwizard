@@ -72,8 +72,9 @@ function update () {
 update()
 window.addEventListener('resize', update)
 
+var h = location.hash
 chat.join('!status')
-if (location.hash) chat.join(location.hash)
+if (h && h !== '#') chat.join(h)
 
 window.addEventListener('hashchange', function () {
   chat.join(location.hash)
@@ -124,8 +125,12 @@ function render (state) {
         var c = state.activity[channel] || ''
         if (state.channel === channel) c = 'current'
         return html`<div class="channel">
-          <a href="${channel}" class="${c}">${channel}</a>
+          <a onclick=${onclick} class="${c}">${channel}</a>
         </div>`
+        function onclick (ev) {
+          ev.preventDefault()
+          selectChannel(channel)
+        }
       })}
     </div></div>
     <div class="lines" onscroll=${onscroll} scroll=${scroll}><div class="inner">
