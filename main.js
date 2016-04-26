@@ -61,7 +61,6 @@ chat.on('say', function (channel, row) {
 })
 
 function update () {
-  console.log('update')
   html.update(root, render(state))
   var lines = root.querySelector('.lines')
   heights[state.channel] = {
@@ -184,16 +183,18 @@ var helpMessage = require('./help.js')
 showHelp()
 
 function showHelp () {
+  helpMessage.split('\n').forEach(showInfo)
+  update()
+}
+
+function showInfo (msg) {
   var lines = state.lines['!status']
   if (!lines) lines = state.lines['!status'] = []
-  lines.push.apply(lines, helpMessage.split('\n').map(function (line) {
-    return {
-      value: {
-        time: Date.now(),
-        who: '!info',
-        message: line
-      }
+  lines.push({
+    value: {
+      time: Date.now(),
+      who: '!info',
+      message: msg
     }
-  }))
-  update()
+  })
 }
