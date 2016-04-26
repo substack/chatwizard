@@ -1,6 +1,5 @@
 var hyperlog = require('hyperlog')
 var keys = require('hyperreal/keys')
-var swarm = require('webrtc-swarm')
 var signalhub = require('signalhub')
 var inherits = require('inherits')
 var EventEmitter = require('events').EventEmitter
