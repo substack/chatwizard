@@ -7,7 +7,7 @@ var root = document.querySelector('#content')
 
 var state = {
   channels: [],
-  channel: location.hash || '(status)',
+  channel: location.hash || '!status',
   nym: randomBytes(3).toString('hex'),
   lines: {},
   activity: {},
@@ -29,6 +29,7 @@ setInterval(update, 1000)
 
 function selectChannel (channel) {
   if (!channel) return
+  if (channel === '#!status') channel = '!status'
   state.channel = channel
   state.activity[channel] = false
 }
@@ -36,7 +37,7 @@ function selectChannel (channel) {
 chat.on('part', function (channel) {
   var ix = state.channels.indexOf(channel)
   if (ix >= 0) state.channels.splice(ix, 1)
-  selectChannel(state.channels[Math.max(0,ix-1)] || '(status)')
+  selectChannel(state.channels[Math.max(0,ix-1)] || '!status')
   update()
 })
 
@@ -60,6 +61,7 @@ chat.on('say', function (channel, row) {
 })
 
 function update () {
+  console.log('update')
   html.update(root, render(state))
   var lines = root.querySelector('.lines')
   heights[state.channel] = {
@@ -71,6 +73,7 @@ function update () {
 update()
 window.addEventListener('resize', update)
 
+chat.join('!status')
 if (location.hash) chat.join(location.hash)
 
 window.addEventListener('hashchange', function () {
@@ -119,7 +122,6 @@ function render (state) {
   return html`<div id="content">
     <div class="channels"><div class="inner">
       ${state.channels.map(function (channel) {
-        if (channel === '#(status)') return ''
         var c = state.activity[channel] || ''
         if (state.channel === channel) c = 'current'
         return html`<div class="channel">
@@ -170,10 +172,28 @@ function handleMsg (msg) {
     chat.nym = msg.split(/\s+/)[1]
     update()
   } else if (cmd === 'help' || cmd === 'h') {
-    chat.join('#(status)')
+    showHelp()
   } else if (cmd) {
     // unknown command
-  } else if (state.channel !== '(status)') {
+  } else if (state.channel !== '!status') {
     chat.say(state.channel, msg)
   }
+}
+
+var helpMessage = require('./help.js')
+showHelp()
+
+function showHelp () {
+  var lines = state.lines['!status']
+  if (!lines) lines = state.lines['!status'] = []
+  lines.push.apply(lines, helpMessage.split('\n').map(function (line) {
+    return {
+      value: {
+        time: Date.now(),
+        who: '!info',
+        message: line
+      }
+    }
+  }))
+  update()
 }

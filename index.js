@@ -30,16 +30,8 @@ function Chat (nym, db) {
 
 Chat.prototype.join = function (channel) {
   var self = this
-  if (channel === '#(status)') {
-    helpMessage.split('\n').forEach(function (msg) {
-      self.emit('say', channel, {
-        value: {
-          time: Date.now(),
-          who: '(info)',
-          message: msg
-        }
-      })
-    })
+  if (channel === '#!status') channel = '!status'
+  if (channel === '!status') {
     return self.emit('join', channel)
   }
   if (has(self.swarms, channel)) {
