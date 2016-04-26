@@ -4,7 +4,6 @@ var uniq = require('uniq')
 var randomBytes = require('randombytes')
 
 var root = document.querySelector('#content')
-
 var state = {
   channels: [],
   channel: location.hash || '!status',
@@ -14,6 +13,8 @@ var state = {
   scroll: {}
 }
 var heights = {}
+var linkRegex = RegExp('((?:https?:|magnet:|ssb:|/ipfs/)\\S+)')
+var linkPartRegex = RegExp('^' + linkRegex.source)
 
 var memdb = require('memdb')
 var chat = require('./index.js')(state.nym, memdb())
@@ -137,10 +138,17 @@ function render (state) {
     <div class="lines" onscroll=${onscroll} scroll=${scroll}><div class="inner">
       ${(state.lines[state.channel] || []).map(function (row) {
         var m = row.value
+        var parts = m.message.split(linkRegex)
         return html`<div class="line">
           <span class="time">${strftime('%T', new Date(m.time))}</span>
           <span class="who">${'<' + m.who + '>'}</span>
-          <span class="message">${m.message}</span>
+          <span class="message">
+            ${parts.map(function (part) {
+              if (linkPartRegex.test(part)) {
+                return html`<a href="${part}">${part}</a>`
+              } else return part
+            })}
+          </span>
         </div>`
       })}
     </div></div>
