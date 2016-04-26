@@ -23,7 +23,7 @@ input, button {
   padding: 1ex;
 }
 .channels {
-  display: absolute;
+  position: absolute;
   top: 0px;
   left: 0px;
   bottom: 4em;
