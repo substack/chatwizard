@@ -130,6 +130,7 @@ function render (state) {
         function onclick (ev) {
           ev.preventDefault()
           selectChannel(channel)
+          update()
         }
       })}
     </div></div>
