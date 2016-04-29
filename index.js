@@ -60,6 +60,7 @@ Chat.prototype.join = function (channel) {
     delete self.peers[channel][id]
   }
   swarm.on('peer', self.onswarm[channel])
+  swarm.on('disconnect', self.ondisconnect[channel])
 }
 
 Chat.prototype.part = function (channel) {
