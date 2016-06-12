@@ -68,7 +68,7 @@ Chat.prototype.part = function (channel) {
   if (!has(self.swarms, channel)) return
   delete self.logs[channel]
   self.swarms[channel].removeListener('peer', self.onswarm[channel])
-  self.swarms[channel].removeListener('peer', self.ondisconnect[channel])
+  self.swarms[channel].removeListener('disconnect', self.ondisconnect[channel])
   delete self.swarms[channel]
   delete self.onswarm[channel]
   delete self.ondisconnect[channel]
